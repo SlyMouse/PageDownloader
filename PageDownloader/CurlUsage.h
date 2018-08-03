@@ -4,3 +4,4 @@
 #include <regex>
 
 std::string DownloadHtml(std::string);
+std::string SaveLocally(std::string);

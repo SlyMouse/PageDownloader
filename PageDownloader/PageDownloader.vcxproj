@@ -148,18 +148,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CurlUsage.h" />
+    <ClInclude Include="Downloader.h" />
+    <ClInclude Include="MyTask.h" />
+    <ClInclude Include="PageParser.h" />
+    <ClInclude Include="Parser.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Saver.h" />
+    <ClInclude Include="SharedQueue.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CurlUsage.cpp" />
+    <ClCompile Include="Downloader.cpp" />
+    <ClCompile Include="Enums.h" />
+    <ClCompile Include="MyTask.cpp" />
     <ClCompile Include="PageDownloader.cpp" />
+    <ClCompile Include="PageParser.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Saver.cpp" />
+    <ClCompile Include="SharedQueue.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="Worker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
