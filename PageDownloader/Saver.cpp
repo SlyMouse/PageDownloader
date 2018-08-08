@@ -26,6 +26,9 @@ void Saver::Save(Resource *resource)
 
 	std::replace(file_name.begin(), file_name.end(), '?', '_');
 
+	if (resource->type_ == ResourceType::Page)
+		file_name += ".html";
+
 	if (boost::filesystem::exists(resource->working_dir_ + file_path + file_name))
 	{
 		resource->is_handled = true;
@@ -39,8 +42,6 @@ void Saver::Save(Resource *resource)
 	
 	if (resource->content_)
 	{
-		if (resource->type_ == ResourceType::Page)
-			file_name += ".html";
 		std::ofstream file(resource->working_dir_ + file_path + file_name);
 		file << *(resource->content_);
 		file.close();
