@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Parser.h"
 #include "Enums.h"
 #include "Worker.h"
@@ -84,8 +83,6 @@ void Parser::Parse(Resource *resource)
 			searchStart += link_match.position() + link_match.length();
 			continue;
 		}
-
-		//Resource found_resource(resource->link_root_, abs, rel, type);
 
 		resource->resources_.push_back(new Resource(resource->link_root_, resource->working_dir_, abs, rel, type));
 		worker_->AddResource(resource->resources_.back());

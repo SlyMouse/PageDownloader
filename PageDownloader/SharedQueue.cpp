@@ -1,12 +1,5 @@
-#include "stdafx.h"
 #include "SharedQueue.h"
 #include "MyTask.h"
-
-template <typename T>
-SharedQueue<T>::SharedQueue() {}
-
-template <typename T>
-SharedQueue<T>::~SharedQueue() {}
 
 template <typename T>
 T& SharedQueue<T>::front()

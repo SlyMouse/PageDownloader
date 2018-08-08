@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include "ThreadPool.h"
-#include <chrono>
 #include "Worker.h"
-#include "Parser.h"
 #include "boost/filesystem.hpp"
+#include "curl/curl.h"
 #include <direct.h>
+#include <chrono>
 
 ThreadPool::ThreadPool()
 {

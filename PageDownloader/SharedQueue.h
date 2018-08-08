@@ -8,9 +8,6 @@ template <typename T>
 class SharedQueue
 {
 public:
-	SharedQueue();
-	~SharedQueue();
-
 	T& front();
 	void pop_front();
 

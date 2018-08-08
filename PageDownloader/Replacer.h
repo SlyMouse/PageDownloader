@@ -6,6 +6,6 @@ class Replacer
 {
 public:
 	static bool Replace(std::string *str, const std::string &from, const std::string &to);
-	void Replace(Resource *);
+	static void Replace(Resource *);
 };
 #endif

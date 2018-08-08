@@ -1,11 +1,10 @@
-#include "stdafx.h"
+#include "MyTask.h"
+#include "ThreadPool.h"
+#include "boost/filesystem.hpp"
 #include <string>
 #include <regex>
 #include <iostream>
 #include <chrono>
-#include "MyTask.h"
-#include "ThreadPool.h"
-#include "boost/filesystem.hpp"
 
 #define THREADS 4
 

@@ -2,7 +2,6 @@
 #define POOL_H
 #include "MyTask.h"
 #include "SharedQueue.h"
-#include "curl/curl.h"
 #include <thread>
 #include <mutex>
 #include <atomic>

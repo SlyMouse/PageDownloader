@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Replacer.h"
 #include <string>
 #include <algorithm>
@@ -18,24 +17,25 @@ void replace(Resource &child, Resource *parent)
 
 bool isHandled(Resource *res)
 {
-	return res->is_handled;
+	bool flag = res->is_handled_;
+	if (flag)
+		delete res;
+	return flag;
 }
 
 void Replacer::Replace(Resource *parent)
 {
 	for (std::vector<Resource *>::iterator i = parent->resources_.begin(); i != parent->resources_.end(); ++i)
 	{
-		if ((*i)->is_handled)
+		if ((*i)->is_handled_)
 		{
 			if ((*i)->is_saved_)
 			{
-				Replacer::Replace(parent->content_, (*i)->link_rel_, (*i)->file_name);
+				Replacer::Replace(parent->content_, (*i)->link_rel_, (*i)->file_name_);
 			}
 			else
 				if ((*i)->link_rel_ != (*i)->link_abs_)
 					Replacer::Replace(parent->content_, (*i)->link_rel_, (*i)->link_abs_);
-
-			//parent->resources_.erase(std::remove(parent->resources_.begin(), parent->resources_.end(), *i), parent->resources_.end());
 		}
 	}
 

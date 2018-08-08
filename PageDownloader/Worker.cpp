@@ -1,12 +1,10 @@
-#include "stdafx.h"
 #include "Parser.h"
 #include "Worker.h"
+#include "Enums.h"
 #include "boost/filesystem.hpp"
 #include <regex>
-#include <direct.h>
-#include "Enums.h"
 
-Worker::Worker(ThreadPool *threads) : downloader_(), saver_(), replacer_(), threads_(threads), parser_(new Parser(this)) {}
+Worker::Worker(ThreadPool *threads) : threads_(threads), parser_(new Parser(this)) {}
 
 Worker::~Worker()
 {
@@ -31,18 +29,18 @@ void Worker::Work()
 		case TaskTarget::DownloadAndParse:
 			if (task_->resource_->type_ == ResourceType::Page || task_->resource_->type_ == ResourceType::Css)
 			{
-				downloader_.Download(task_->resource_);
+				Downloader::Download(task_->resource_, false);
 				parser_->Parse(task_->resource_);
 				task_->target_ = TaskTarget::Replace;
 			}
 
 		case TaskTarget::Replace: 
-			replacer_.Replace(task_->resource_); 
+			Replacer::Replace(task_->resource_); 
 			if(task_->resource_->resources_.size() == 0)
 				task_->target_ = TaskTarget::Save;
 			else break;
 
-		case TaskTarget::Save: saver_.Save(task_->resource_); task_->target_ = TaskTarget::Done;
+		case TaskTarget::Save: Saver::Save(task_->resource_); task_->target_ = TaskTarget::Done;
 
 		case TaskTarget::Done: return;
 	}

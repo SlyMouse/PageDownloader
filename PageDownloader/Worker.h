@@ -17,8 +17,6 @@ public:
 	Replacer replacer_;
 	Parser *parser_;
 private:
-	Downloader downloader_;
-	Saver saver_;
 	ThreadPool *threads_;
 };
 #endif
