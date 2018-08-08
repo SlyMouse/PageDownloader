@@ -27,7 +27,7 @@ void Parser::Parse(std::shared_ptr<Resource> resource)
 	std::smatch match;
 	std::string abs;
 	std::string rel;
-	std::string content = resource->content_;
+	std::string content = resource->get_content();
 	ResourceType type;
 
 	link_re = std::regex("(href=\"|src=\"|url\\()(.+?)(\\)|\")");
@@ -39,13 +39,13 @@ void Parser::Parse(std::shared_ptr<Resource> resource)
 
 		re = std::regex("^/([^/].*)");
 		if (std::regex_search(rel, match, re))
-			abs = resource->link_root_ + rel;
+			abs = resource->get_link_root() + rel;
 
 		re = std::regex("^//(.*)");
 		if (std::regex_search(rel, match, re))
 		{
 			re = std::regex("^(.+?)//");
-			std::regex_search(resource->link_root_, match, re);
+			std::regex_search(resource->get_link_root(), match, re);
 			std::string protocol = match[1].str();
 			abs = protocol + rel;
 		}
@@ -87,13 +87,13 @@ void Parser::Parse(std::shared_ptr<Resource> resource)
 		else
 		{
 			if (rel != abs)
-				Replacer::Replace(&resource->content_, rel, abs);
+				Replacer::Replace(resource->modify_content(), rel, abs);
 			searchStart += link_match.position() + link_match.length();
 			continue;
 		}
 
-		resource->resources_.push_back(std::shared_ptr<Resource>(new Resource(resource->link_root_, resource->working_dir_, abs, rel, type)));
-		Worker::AddResource(resource->resources_.back());
+		std::shared_ptr<Resource> found_resource = std::shared_ptr<Resource>(new Resource(resource->get_link_root(), resource->get_working_dir(), abs, rel, type));
+		Worker::AddResource(resource->add_resource(found_resource));
 
 		searchStart += link_match.position() + link_match.length();
 	}

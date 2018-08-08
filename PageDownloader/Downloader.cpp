@@ -1,6 +1,8 @@
 #include "Downloader.h"
-#include "curl/curl.h"
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "curl/curl.h"
 
 struct MemoryStruct {
 	char *memory;
@@ -36,11 +38,11 @@ void Downloader::Download(std::shared_ptr<Resource> resource, bool to_file)
 	curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_easy_setopt(curl_, CURLOPT_DEFAULT_PROTOCOL, "https");
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36");
-	curl_easy_setopt(curl_, CURLOPT_URL, resource->link_abs_.c_str());
+	curl_easy_setopt(curl_, CURLOPT_URL, resource->get_link_abs().c_str());
 
 	if (to_file)
 	{
-		fopen_s(&file, (resource->working_dir_ + resource->file_name_).c_str(), "wb");
+		fopen_s(&file, (resource->get_working_dir() + resource->get_file_name()).c_str(), "wb");
 		curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file);
 	}
 	else
@@ -52,13 +54,13 @@ void Downloader::Download(std::shared_ptr<Resource> resource, bool to_file)
 	
 	res = curl_easy_perform(curl_);
 	if (res != CURLE_OK)
-		std::cout << resource->link_abs_ << ": Failed\nDownloader failed: " << curl_easy_strerror(res) << std::endl;
+		std::cout << resource->get_link_abs() << ": Failed\nDownloader failed: " << curl_easy_strerror(res) << std::endl;
 	else
 	{
-		std::cout << resource->link_abs_ << ": Success" << std::endl;
+		std::cout << resource->get_link_abs() << ": Success" << std::endl;
 		if(!to_file)
-			resource->content_ = std::string(chunk.memory, chunk.size);
-		resource->is_saved_ = true;
+			resource->set_content(std::string(chunk.memory, chunk.size));
+		resource->set_is_saved(true);
 	}
 
 	if (to_file)

@@ -161,8 +161,10 @@
     <ClCompile Include="Downloader.cpp" />
     <ClCompile Include="Enums.h" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MyTask.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Replacer.cpp" />
+    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="Saver.cpp" />
     <ClCompile Include="SharedQueue.cpp" />
     <ClCompile Include="ThreadPool.cpp" />

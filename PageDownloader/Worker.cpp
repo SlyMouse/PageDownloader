@@ -12,7 +12,7 @@
 void Worker::AddResource(std::shared_ptr<Resource> resource)
 {
 	TaskTarget target;
-	if (resource->type_ == ResourceType::Page || resource->type_ == ResourceType::Css)
+	if (resource->get_type() == ResourceType::Page || resource->get_type() == ResourceType::Css)
 		target = TaskTarget::DownloadAndParse;
 	else
 		target = TaskTarget::Save;
@@ -22,23 +22,23 @@ void Worker::AddResource(std::shared_ptr<Resource> resource)
 
 void Worker::Work(MyTask *task_)
 {
-	switch (task_->target_)
+	switch (task_->get_target())
 	{
 		case TaskTarget::DownloadAndParse:
-			if (task_->resource_->type_ == ResourceType::Page || task_->resource_->type_ == ResourceType::Css)
+			if (task_->get_resource()->get_type() == ResourceType::Page || task_->get_resource()->get_type() == ResourceType::Css)
 			{
-				Downloader::Download(task_->resource_, false);
-				Parser::Parse(task_->resource_);
-				task_->target_ = TaskTarget::Replace;
+				Downloader::Download(task_->get_resource(), false);
+				Parser::Parse(task_->get_resource());
+				task_->set_target(TaskTarget::Replace);
 			}
 
 		case TaskTarget::Replace: 
-			Replacer::Replace(task_->resource_); 
-			if(task_->resource_->resources_.size() == 0)
-				task_->target_ = TaskTarget::Save;
+			Replacer::Replace(task_->get_resource()); 
+			if(task_->get_resource()->get_resources().size() == 0)
+				task_->set_target(TaskTarget::Save);
 			else break;
 
-		case TaskTarget::Save: Saver::Save(task_->resource_); task_->target_ = TaskTarget::Done;
+		case TaskTarget::Save: Saver::Save(task_->get_resource()); task_->set_target(TaskTarget::Done);
 
 		case TaskTarget::Done: return;
 	}

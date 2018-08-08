@@ -1,6 +1,5 @@
 #include "Replacer.h"
 #include <string>
-#include <algorithm>
 
 bool Replacer::Replace(std::string *str, const std::string &from, const std::string &to) {
 	size_t start_pos = (*str).find(from);
@@ -12,29 +11,24 @@ bool Replacer::Replace(std::string *str, const std::string &from, const std::str
 
 void replace(Resource &child, Resource *parent)
 {
-	Replacer::Replace(&parent->content_, child.link_rel_, child.link_abs_);
-}
-
-bool isHandled(std::shared_ptr<Resource> res)
-{
-	return res->is_handled_;
+	Replacer::Replace(parent->modify_content(), child.get_link_rel(), child.get_link_abs());
 }
 
 void Replacer::Replace(std::shared_ptr<Resource> parent)
 {
-	for (std::vector<std::shared_ptr<Resource>>::iterator i = parent->resources_.begin(); i != parent->resources_.end(); ++i)
+	for (std::vector<std::shared_ptr<Resource>>::const_iterator i = parent->get_resources().begin(); i != parent->get_resources().end(); ++i)
 	{
-		if ((*i)->is_handled_)
+		if ((*i)->get_is_handled())
 		{
-			if ((*i)->is_saved_)
+			if ((*i)->get_is_saved())
 			{
-				Replacer::Replace(&parent->content_, (*i)->link_rel_, (*i)->file_name_);
+				Replacer::Replace(parent->modify_content(), (*i)->get_link_rel(), (*i)->get_file_name());
 			}
 			else
-				if ((*i)->link_rel_ != (*i)->link_abs_)
-					Replacer::Replace(&parent->content_, (*i)->link_rel_, (*i)->link_abs_);
+				if ((*i)->get_link_rel() != (*i)->get_link_abs())
+					Replacer::Replace(parent->modify_content(), (*i)->get_link_rel(), (*i)->get_link_abs());
 		}
 	}
 
-	parent->resources_.erase(std::remove_if(parent->resources_.begin(), parent->resources_.end(), isHandled), parent->resources_.end());
+	parent->remove_handled_resources();
 }

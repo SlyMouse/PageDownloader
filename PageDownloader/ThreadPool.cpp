@@ -25,8 +25,6 @@ void ThreadPool::initializeWithThreads(size_t threads)
 	{
 		workers_.emplace_back([this]() -> void
 		{
-			Worker worker;
-			//worker.parser_ = new Parser(&worker);
 			while (true)
 			{
 				MyTask task;
@@ -45,7 +43,7 @@ void ThreadPool::initializeWithThreads(size_t threads)
 				}   //release lock
 				
 				Worker::Work(&task);
-				if (task.target_ != TaskTarget::Done)
+				if (task.get_target() != TaskTarget::Done)
 					schedule(task);
 				count_--;
 			}

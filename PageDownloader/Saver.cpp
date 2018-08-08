@@ -6,12 +6,12 @@
 
 void Saver::Save(std::shared_ptr<Resource> resource)
 {
-	std::string file_name = resource->link_rel_;
+	std::string file_name = resource->get_link_rel();
 	std::string file_path = "";
 	std::regex re("(?:https?:)?(?://)?(?:/)?(.+/)(.+)");
 	std::smatch match;
 
-	if (std::regex_search(resource->link_rel_, match, re))
+	if (std::regex_search(resource->get_link_rel(), match, re))
 	{
 		file_path = match[1].str();
 		file_name = match[2].str();
@@ -19,33 +19,33 @@ void Saver::Save(std::shared_ptr<Resource> resource)
 
 	std::replace(file_name.begin(), file_name.end(), '?', '_');
 
-	if (resource->type_ == ResourceType::Page)
+	if (resource->get_type() == ResourceType::Page)
 		file_name += ".html";
 
-	if (boost::filesystem::exists(resource->working_dir_ + file_path + file_name))
+	if (boost::filesystem::exists(resource->get_working_dir() + file_path + file_name))
 	{
-		resource->is_handled_ = true;
+		resource->set_is_handled(true);
 		return;
 	}
 
 	if (file_path != "")
 	{
-		boost::filesystem::create_directories(resource->working_dir_ + file_path);
+		boost::filesystem::create_directories(resource->get_working_dir() + file_path);
 	}
 	
-	resource->file_name_ = file_path + file_name;
+	resource->set_file_name(file_path + file_name);
 
-	if (resource->content_ != "")
+	if (resource->get_content() != "")
 	{
-		std::ofstream file(resource->working_dir_ + file_path + file_name);
-		file << resource->content_;
+		std::ofstream file(resource->get_working_dir() + file_path + file_name);
+		file << resource->get_content();
 		file.close();
-		resource->is_saved_ = true;
+		resource->set_is_saved(true);
 	}
 	else
 	{
 		Downloader::Download(resource, true);
 	}
 	
-	resource->is_handled_ = true;
+	resource->set_is_handled(true);
 }
