@@ -5,7 +5,7 @@
 class Downloader
 {
 public:
-	static void Download(Resource *, bool to_file);
+	static void Download(std::shared_ptr<Resource>, bool to_file);
 };
 
 #endif

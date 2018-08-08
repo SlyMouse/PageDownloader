@@ -7,8 +7,8 @@ class MyTask
 {
 public:
 	MyTask() {};
-	MyTask(Resource *resource, TaskTarget status) : resource_(resource), target_(status) {};
-	Resource *resource_;
+	MyTask(std::shared_ptr<Resource> resource, TaskTarget status) : resource_(resource), target_(status) {};
+	std::shared_ptr<Resource> resource_;
 	TaskTarget target_;
 };
 #endif

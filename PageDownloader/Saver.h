@@ -5,6 +5,6 @@
 class Saver
 {
 public:
-	static void Save(Resource *);
+	static void Save(std::shared_ptr<Resource>);
 };
 #endif

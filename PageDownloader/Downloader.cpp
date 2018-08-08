@@ -25,12 +25,12 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 	return realsize;
 }
 
-void Downloader::Download(Resource *resource, bool to_file)
+void Downloader::Download(std::shared_ptr<Resource> resource, bool to_file)
 {
 	CURLcode res;
 	FILE *file = nullptr;
 	struct MemoryStruct chunk;
-	chunk.memory = (char *)malloc(1);
+	chunk.memory = nullptr;
 	chunk.size = 0;
 	CURL *curl_ = curl_easy_init();
 	curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -45,6 +45,7 @@ void Downloader::Download(Resource *resource, bool to_file)
 	}
 	else
 	{
+		chunk.memory = (char *)malloc(1);
 		curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 		curl_easy_setopt(curl_, CURLOPT_WRITEDATA, (void *)&chunk);
 	}
@@ -56,7 +57,7 @@ void Downloader::Download(Resource *resource, bool to_file)
 	{
 		std::cout << resource->link_abs_ << ": Success" << std::endl;
 		if(!to_file)
-			resource->content_ = new std::string(chunk.memory, chunk.size);
+			resource->content_ = std::string(chunk.memory, chunk.size);
 		resource->is_saved_ = true;
 	}
 

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <regex>
 
-void Saver::Save(Resource *resource)
+void Saver::Save(std::shared_ptr<Resource> resource)
 {
 	std::string file_name = resource->link_rel_;
 	std::string file_path = "";
@@ -35,10 +35,10 @@ void Saver::Save(Resource *resource)
 	
 	resource->file_name_ = file_path + file_name;
 
-	if (resource->content_)
+	if (resource->content_ != "")
 	{
 		std::ofstream file(resource->working_dir_ + file_path + file_name);
-		file << *(resource->content_);
+		file << resource->content_;
 		file.close();
 		resource->is_saved_ = true;
 	}

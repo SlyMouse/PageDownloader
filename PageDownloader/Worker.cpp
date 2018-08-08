@@ -1,17 +1,15 @@
-#include "Parser.h"
 #include "Worker.h"
-#include "Enums.h"
-#include "boost/filesystem.hpp"
 #include <regex>
+#include "Enums.h"
+#include "ThreadPool.h"
+#include "Downloader.h"
+#include "Saver.h"
+#include "Replacer.h"
+#include "Parser.h"
+#include "boost/filesystem.hpp"
 
-Worker::Worker(ThreadPool *threads) : threads_(threads), parser_(new Parser(this)) {}
 
-Worker::~Worker()
-{
-	delete parser_;
-}
-
-void Worker::AddResource(Resource *resource)
+void Worker::AddResource(std::shared_ptr<Resource> resource)
 {
 	TaskTarget target;
 	if (resource->type_ == ResourceType::Page || resource->type_ == ResourceType::Css)
@@ -19,10 +17,10 @@ void Worker::AddResource(Resource *resource)
 	else
 		target = TaskTarget::Save;
 	MyTask task(resource, target);
-	threads_->schedule(task);
+	ThreadPool::Instance().schedule(task);
 }
 
-void Worker::Work()
+void Worker::Work(MyTask *task_)
 {
 	switch (task_->target_)
 	{
@@ -30,7 +28,7 @@ void Worker::Work()
 			if (task_->resource_->type_ == ResourceType::Page || task_->resource_->type_ == ResourceType::Css)
 			{
 				Downloader::Download(task_->resource_, false);
-				parser_->Parse(task_->resource_);
+				Parser::Parse(task_->resource_);
 				task_->target_ = TaskTarget::Replace;
 			}
 

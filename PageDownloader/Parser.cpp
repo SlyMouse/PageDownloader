@@ -1,7 +1,15 @@
 #include "Parser.h"
+
+#include <array>
+#include <vector>
+#include <regex>
+
+#include "Replacer.h"
 #include "Enums.h"
 #include "Worker.h"
-#include <regex>
+
+
+static constexpr std::array<const char*, 12U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "eot?#iefix", "js" };
 
 bool replace(std::string *str, const std::string &from, const std::string &to) {
 	size_t start_pos = (*str).find(from);
@@ -11,7 +19,7 @@ bool replace(std::string *str, const std::string &from, const std::string &to) {
 	return true;
 }
 
-void Parser::Parse(Resource *resource)
+void Parser::Parse(std::shared_ptr<Resource> resource)
 {
 	std::regex re;
 	std::regex link_re;
@@ -19,7 +27,7 @@ void Parser::Parse(Resource *resource)
 	std::smatch match;
 	std::string abs;
 	std::string rel;
-	std::string content = *resource->content_;
+	std::string content = resource->content_;
 	ResourceType type;
 
 	link_re = std::regex("(href=\"|src=\"|url\\()(.+?)(\\)|\")");
@@ -79,13 +87,13 @@ void Parser::Parse(Resource *resource)
 		else
 		{
 			if (rel != abs)
-				worker_->replacer_.Replace(resource->content_, rel, abs);
+				Replacer::Replace(&resource->content_, rel, abs);
 			searchStart += link_match.position() + link_match.length();
 			continue;
 		}
 
-		resource->resources_.push_back(new Resource(resource->link_root_, resource->working_dir_, abs, rel, type));
-		worker_->AddResource(resource->resources_.back());
+		resource->resources_.push_back(std::shared_ptr<Resource>(new Resource(resource->link_root_, resource->working_dir_, abs, rel, type)));
+		Worker::AddResource(resource->resources_.back());
 
 		searchStart += link_match.position() + link_match.length();
 	}

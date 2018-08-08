@@ -1,18 +1,13 @@
 #include "ThreadPool.h"
+#include <direct.h>
+#include <chrono>
 #include "Worker.h"
 #include "boost/filesystem.hpp"
 #include "curl/curl.h"
-#include <direct.h>
-#include <chrono>
 
 ThreadPool::ThreadPool()
 {
 	curl_global_init(CURL_GLOBAL_ALL);
-}
-
-ThreadPool::ThreadPool(size_t threads) : ThreadPool()
-{
-	initializeWithThreads(threads);
 }
 
 ThreadPool::~ThreadPool()
@@ -30,7 +25,7 @@ void ThreadPool::initializeWithThreads(size_t threads)
 	{
 		workers_.emplace_back([this]() -> void
 		{
-			Worker worker(this);
+			Worker worker;
 			//worker.parser_ = new Parser(&worker);
 			while (true)
 			{
@@ -49,8 +44,7 @@ void ThreadPool::initializeWithThreads(size_t threads)
 					queue_.pop_front();
 				}   //release lock
 				
-				worker.task_ = &task;
-				worker.Work();
+				Worker::Work(&task);
 				if (task.target_ != TaskTarget::Done)
 					schedule(task);
 				count_--;
@@ -73,4 +67,10 @@ void ThreadPool::wait() const
 {
 	while (count_ != 0)
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
+}
+
+ThreadPool& ThreadPool::Instance() 
+{
+	static ThreadPool instance;
+	return instance;
 }

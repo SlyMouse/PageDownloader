@@ -12,30 +12,27 @@ bool Replacer::Replace(std::string *str, const std::string &from, const std::str
 
 void replace(Resource &child, Resource *parent)
 {
-	Replacer::Replace(parent->content_, child.link_rel_, child.link_abs_);
+	Replacer::Replace(&parent->content_, child.link_rel_, child.link_abs_);
 }
 
-bool isHandled(Resource *res)
+bool isHandled(std::shared_ptr<Resource> res)
 {
-	bool flag = res->is_handled_;
-	if (flag)
-		delete res;
-	return flag;
+	return res->is_handled_;
 }
 
-void Replacer::Replace(Resource *parent)
+void Replacer::Replace(std::shared_ptr<Resource> parent)
 {
-	for (std::vector<Resource *>::iterator i = parent->resources_.begin(); i != parent->resources_.end(); ++i)
+	for (std::vector<std::shared_ptr<Resource>>::iterator i = parent->resources_.begin(); i != parent->resources_.end(); ++i)
 	{
 		if ((*i)->is_handled_)
 		{
 			if ((*i)->is_saved_)
 			{
-				Replacer::Replace(parent->content_, (*i)->link_rel_, (*i)->file_name_);
+				Replacer::Replace(&parent->content_, (*i)->link_rel_, (*i)->file_name_);
 			}
 			else
 				if ((*i)->link_rel_ != (*i)->link_abs_)
-					Replacer::Replace(parent->content_, (*i)->link_rel_, (*i)->link_abs_);
+					Replacer::Replace(&parent->content_, (*i)->link_rel_, (*i)->link_abs_);
 		}
 	}
 

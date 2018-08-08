@@ -1,12 +1,14 @@
-#include "MyTask.h"
-#include "ThreadPool.h"
-#include "boost/filesystem.hpp"
 #include <string>
 #include <regex>
 #include <iostream>
 #include <chrono>
+#include <array>
+#include "MyTask.h"
+#include "ThreadPool.h"
+#include "boost/filesystem.hpp"
 
 #define THREADS 4
+static constexpr std::array<const char*, 13U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "eot?#iefix", "js", "pdf" };
 
 int main(int argc, char *argv)
 {
@@ -16,9 +18,10 @@ int main(int argc, char *argv)
 	std::smatch match_prot;
 	std::string root;
 	std::string dir;
-	std::vector<Resource *> vec;
+	std::vector<std::shared_ptr<Resource>> vec(500);
 	{
-		ThreadPool pool(THREADS);
+		ThreadPool& pool = ThreadPool::Instance();
+		pool.initializeWithThreads(THREADS);
 		for (std::string line; std::getline(std::cin, line);)
 		{
 			if (line == "")
@@ -35,8 +38,26 @@ int main(int argc, char *argv)
 				std::replace(dir.begin(), dir.end(), '?', '_');
 				dir += "/";
 				boost::filesystem::create_directory(dir);
-				vec.push_back(new Resource(root, dir, line, ResourceType::Page));
-				MyTask task(vec.back(), TaskTarget::DownloadAndParse);
+				ResourceType type;
+				TaskTarget target = TaskTarget::DownloadAndParse;
+				std::regex re_format = std::regex("\\.((?:.(?!\\.))+)$");
+				if (std::regex_search(line, match, re_format))
+				{
+					std::string format = match[1].str();
+					if (format == "css")
+						type = ResourceType::Css;
+					else if (std::find(whitelist_.begin(), whitelist_.end(), format) != whitelist_.end())
+					{
+						type = ResourceType::Other;
+						target = TaskTarget::Save;
+					}
+					else
+					{
+						type = ResourceType::Page;
+					}
+				}
+				vec.push_back(std::shared_ptr<Resource>(new Resource(root, dir, line, type)));
+				MyTask task(vec.back(), target);
 				pool.schedule(task);
 			}
 			else
