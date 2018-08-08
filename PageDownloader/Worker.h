@@ -1,21 +1,24 @@
-#pragma once
+#ifndef WORKER_H
+#define WORKER_H
 #include "Downloader.h"
-#include "Parser.h"
 #include "Saver.h"
 #include "ThreadPool.h"
 #include "MyTask.h"
-
+#include "Replacer.h"
+class Parser;
 class Worker
 {
 public:
-	Worker();
-	void AddResource(Resource resource);
-	void ChangeDir();
+	Worker(ThreadPool *);
+	~Worker();
+	void AddResource(Resource *);
 	void Work();
+	MyTask *task_;
+	Replacer replacer_;
+	Parser *parser_;
 private:
 	Downloader downloader_;
-	Parser parser_;
 	Saver saver_;
 	ThreadPool *threads_;
-	MyTask task_;
 };
+#endif

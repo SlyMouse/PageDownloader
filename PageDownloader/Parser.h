@@ -1,16 +1,15 @@
-#pragma once
+#ifndef PARSER_H
+#define PARSER_H
 #include "Resource.h"
-#include "Worker.h"
-
+class Worker;
 class Parser
 {
 public:
 	Parser() {};
 	Parser(Worker *worker) : worker_(worker) {};
-	void Parse(Resource &);
-	void Replace(Resource &child, Resource &parent);
-	void Replace(std::string rel, std::string abs, Resource &parent);
-private:
+	void Parse(Resource *);
 	Worker *worker_;
-	std::vector<std::string>whitelist_ = {"png", "jpg", "svg", "bmp", "gif"};
+private:
+	std::vector<std::string>whitelist_ = {"png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "eot?#iefix", "js"};
 };
+#endif // !PARSER_h

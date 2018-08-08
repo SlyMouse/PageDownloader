@@ -1,55 +1,49 @@
 #include "stdafx.h"
+#include "Parser.h"
 #include "Worker.h"
 #include "boost/filesystem.hpp"
 #include <regex>
 #include <direct.h>
 #include "Enums.h"
 
-Worker::Worker()
+Worker::Worker(ThreadPool *threads) : downloader_(), saver_(), replacer_(), threads_(threads), parser_(new Parser(this)) {}
+
+Worker::~Worker()
 {
-	downloader_ = Downloader();
-	parser_ = Parser(this);
-	saver_ = Saver();
+	delete parser_;
 }
 
-void Worker::ChangeDir()
-{
-	std::regex re("(https?://)?(www\.)?(.+\..+)");
-	std::smatch match;
-	std::string path;
-	if (std::regex_search(task_.resource_.link_rel_, match, re))
-		path = match[3].str();
-	std::replace(path.begin(), path.end(), '/', '_');
-	_chdir("..");
-	boost::filesystem::create_directory(path);
-	_chdir(path.c_str());
-}
-
-void Worker::AddResource(Resource resource)
+void Worker::AddResource(Resource *resource)
 {
 	TaskTarget target;
-	if (resource.type_ == Page || resource.type_ == Css)
-		target = DownloadAndParse;
+	if (resource->type_ == ResourceType::Page || resource->type_ == ResourceType::Css)
+		target = TaskTarget::DownloadAndParse;
 	else
-		target = Save;
-	task_ = MyTask(resource, target);
-	threads_->schedule(task_);
+		target = TaskTarget::Save;
+	MyTask task(resource, target);
+	threads_->schedule(task);
 }
 
 void Worker::Work()
 {
-	switch (task_.target_)
+	switch (task_->target_)
 	{
-		case SetRoot: ChangeDir(); task_.target_ = DownloadAndParse;
-		
-		case DownloadAndParse:
-			if (task_.resource_.type_ == Page || task_.resource_.type_ == Css)
+		case TaskTarget::DownloadAndParse:
+			if (task_->resource_->type_ == ResourceType::Page || task_->resource_->type_ == ResourceType::Css)
 			{
-				downloader_.Download(task_.resource_);
-				parser_.Parse(task_.resource_);
-				task_.target_ = Save;
+				downloader_.Download(task_->resource_);
+				parser_->Parse(task_->resource_);
+				task_->target_ = TaskTarget::Replace;
 			}
 
-		case Save: saver_.Save(task_.resource_); task_.target_ = Done;
+		case TaskTarget::Replace: 
+			replacer_.Replace(task_->resource_); 
+			if(task_->resource_->resources_.size() == 0)
+				task_->target_ = TaskTarget::Save;
+			else break;
+
+		case TaskTarget::Save: saver_.Save(task_->resource_); task_->target_ = TaskTarget::Done;
+
+		case TaskTarget::Done: return;
 	}
 }

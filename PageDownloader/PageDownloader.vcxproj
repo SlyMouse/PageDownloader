@@ -147,11 +147,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CurlUsage.h" />
     <ClInclude Include="Downloader.h" />
     <ClInclude Include="MyTask.h" />
-    <ClInclude Include="PageParser.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Replacer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Saver.h" />
     <ClInclude Include="SharedQueue.h" />
@@ -161,13 +160,11 @@
     <ClInclude Include="Worker.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CurlUsage.cpp" />
     <ClCompile Include="Downloader.cpp" />
     <ClCompile Include="Enums.h" />
-    <ClCompile Include="MyTask.cpp" />
-    <ClCompile Include="PageDownloader.cpp" />
-    <ClCompile Include="PageParser.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Replacer.cpp" />
     <ClCompile Include="Saver.cpp" />
     <ClCompile Include="SharedQueue.cpp" />
     <ClCompile Include="stdafx.cpp">

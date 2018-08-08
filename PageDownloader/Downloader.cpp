@@ -6,8 +6,7 @@ struct MemoryStruct {
 	size_t size;
 };
 
-static size_t
-WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	size_t realsize = size * nmemb;
 	struct MemoryStruct *mem = (struct MemoryStruct *)userp;
@@ -30,25 +29,25 @@ Downloader::~Downloader()
 	curl_easy_cleanup(curl_);
 }
 
-void Downloader::Download(Resource &resource)
+void Downloader::Download(Resource *resource)
 {
 	CURLcode res;
 	struct MemoryStruct chunk;
 	chunk.memory = (char *)malloc(1);
 	chunk.size = 0;
-
 	curl_ = curl_easy_init();
 	curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, FALSE);
-	curl_easy_setopt(curl_, CURLOPT_URL, resource.link_abs_.c_str());
+	curl_easy_setopt(curl_, CURLOPT_DEFAULT_PROTOCOL, "https");
+	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36");
+	curl_easy_setopt(curl_, CURLOPT_URL, resource->link_abs_.c_str());
 	curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_, CURLOPT_WRITEDATA, (void *)&chunk);
-
 	res = curl_easy_perform(curl_);
 	if (res != CURLE_OK)
 		fprintf(stderr, "Downloader failed: %s\n", curl_easy_strerror(res));
 	else
 	{
-		resource.content_ = chunk.memory;
-		resource.content_size_ = chunk.size;
+		resource->content_ = new std::string(chunk.memory);
+		resource->content_size_ = chunk.size;
 	}
 }

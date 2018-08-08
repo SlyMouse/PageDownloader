@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SharedQueue.h"
+#include "MyTask.h"
 
 template <typename T>
 SharedQueue<T>::SharedQueue() {}
@@ -66,3 +67,5 @@ bool SharedQueue<T>::empty()
 	mlock.unlock();
 	return empty;
 }
+
+template class SharedQueue<MyTask>;

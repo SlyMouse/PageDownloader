@@ -1,4 +1,5 @@
-#pragma once
+#ifndef POOL_H
+#define POOL_H
 #include "MyTask.h"
 #include "SharedQueue.h"
 #include "curl/curl.h"
@@ -15,15 +16,16 @@ public:
 	~ThreadPool();
 
 	void initializeWithThreads(size_t threads);
-	void schedule(const MyTask&);
+	void schedule(MyTask);
 	void wait() const;
 
 private:
 	std::vector<std::thread> workers_;
 	SharedQueue<MyTask> queue_;
-	std::atomic_uint count_;
+	std::atomic_uint count_ = 0;
 	std::mutex mutex_;
 	std::condition_variable condition_;
-	std::atomic_bool stop_;
+	std::atomic_bool stop_ = false;
 };
+#endif
 

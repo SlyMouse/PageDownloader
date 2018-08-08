@@ -1,6 +1,7 @@
-#pragma once
 #include "stdafx.h"
+#ifndef ENUMS_H
+#define ENUMS_H
+enum class TaskTarget { DownloadAndParse, Replace, Save, Done};
 
-enum TaskTarget { SetRoot, DownloadAndParse, Save, Done};
-
-enum ResourceType { Page, Css, Other};
+enum class ResourceType { Page, Css, Other};
+#endif
