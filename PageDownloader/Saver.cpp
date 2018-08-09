@@ -1,13 +1,26 @@
+/**
+ * @brief Implementation of the Saver class
+ * 
+ * @file Saver.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "Saver.h"
 #include "Downloader.h"
 #include "boost/filesystem.hpp"
 #include <fstream>
 #include <regex>
 #include <algorithm>
-const static std::regex re("/?/(.*/)(.+)$");
-const static std::regex re_domain("(?:.+://)(.+)$");
-const static std::regex re_param("(.+)\\?.*");
+const static std::regex re("/?/(.*/)(.+)$"); //!< File path and file name from link
+const static std::regex re_domain("(?:.+://)(.+)$"); //!< Base domain from link
+const static std::regex re_param("(.+)\\?.*"); //!< Link parameters
 
+/**
+* @brief Writes resource's downloaded content to the file or downloads resource to file
+* 
+* @param resource
+*/
 void Saver::Save(std::shared_ptr<Resource> resource)
 {
 	std::string file_name = resource->get_link_rel();

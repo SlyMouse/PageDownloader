@@ -1,3 +1,10 @@
+/**
+ * @brief Implementation of the ThreadPool class
+ * 
+ * @file ThreadPool.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
 #include "ThreadPool.h"
 #include <direct.h>
 #include <chrono>
@@ -5,11 +12,19 @@
 #include "boost/filesystem.hpp"
 #include "curl/curl.h"
 
+/**
+	 * @brief Construct a new Thread Pool object
+	 * 
+	 */
 ThreadPool::ThreadPool()
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 }
 
+/**
+	 * @brief Destroy the Thread Pool object
+	 * 
+	 */
 ThreadPool::~ThreadPool()
 {
 	stop_ = true;
@@ -19,6 +34,11 @@ ThreadPool::~ThreadPool()
 	curl_global_cleanup();
 }
 
+/**
+	 * @brief Start ThreadPool's work
+	 * 
+	 * @param threads Number of threads
+	 */
 void ThreadPool::initializeWithThreads(size_t threads)
 {
 	for (size_t i = 0; i < threads; i++)
@@ -51,6 +71,11 @@ void ThreadPool::initializeWithThreads(size_t threads)
 	}
 }
 
+/**
+	 * @brief Add new task to the queue
+	 * 
+	 * @param task 
+	 */
 void ThreadPool::schedule(MyTask task)
 {
 	{
@@ -61,12 +86,21 @@ void ThreadPool::schedule(MyTask task)
 	condition_.notify_one();
 }
 
+/**
+	 * @brief Tells thread to wait
+	 * 
+	 */
 void ThreadPool::wait() const
 {
 	while (count_ != 0)
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 }
 
+/**
+	 * @brief Create or get Singleton instance of the ThreadPool
+	 * 
+	 * @return ThreadPool& 
+	 */
 ThreadPool& ThreadPool::Instance() 
 {
 	static ThreadPool instance;

@@ -1,12 +1,29 @@
+/**
+ * @brief Implementation of the Downloader class
+ * 
+ * @file Downloader.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "Downloader.h"
 #include <iostream>
 #include "curl/curl.h"
 
+/**
+ * @brief Struct for downloading web resource into the memory
+ * 
+ */
 struct MemoryStruct {
-	char *memory;
-	size_t size;
+	char *memory;	//!< Pointer to memory
+	size_t size;	//!< Size of data
 };
 
+/**
+ * @brief Callback for writting to memory
+ * 
+ * @return size_t Size of data
+ */
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	size_t realsize = size * nmemb;
@@ -25,6 +42,12 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 	return realsize;
 }
 
+/**
+* @brief Downloads web resource to the disk or memory with help of libcurl
+* 
+* @param resource Resource
+* @param to_file Tells if resource should be downloaded to file or memory
+*/
 void Downloader::Download(std::shared_ptr<Resource> resource, bool to_file)
 {
 	CURLcode res;

@@ -1,6 +1,23 @@
+/**
+ * @brief Implementation of the Replacer class
+ * 
+ * @file Replacer.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "Replacer.h"
 #include <string>
 
+/**
+	 * @brief Find substring in string and replace it with another string
+	 * 
+	 * @param str Original string
+	 * @param from Original substring
+	 * @param to Replacement
+	 * @return true 
+	 * @return false 
+	 */
 bool Replacer::Replace(std::string &str, const std::string &from, const std::string &to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == std::string::npos)
@@ -30,5 +47,9 @@ void Replacer::Replace(std::shared_ptr<Resource> parent)
 		}
 	}
 
+	/**
+	 * @brief Replaces resource's links to child resource with path to locally saved copy
+	 * 
+	 */
 	parent->remove_handled_resources();
 }

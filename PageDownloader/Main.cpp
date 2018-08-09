@@ -1,3 +1,11 @@
+/**
+ * @brief Program starts from here
+ * 
+ * @file Main.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include <string>
 #include <regex>
 #include <iostream>
@@ -9,15 +17,13 @@
 
 #define THREADS 4
 static constexpr std::array<const char*, 12U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "js", "pdf" };
-static const std::regex re("^((?:.+)?://)?(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //Correct link. 1 - Protocol, 2 - Hostname, 3 - Path
-static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //File format
+static const std::regex re("^((?:.+)?://)?(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //!< Correct link. 1 - Protocol, 2 - Hostname, 3 - Path
+static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //!< File format
 //static const std::regex re_prot("^https?:\/\/.+");
 //static const std::regex re_dir("(https?://)?(www\.)?(.+\..+)");
 
 int main(int argc, char *argv)
 {
-	
-	
 	//std::vector<std::shared_ptr<Resource>> vec;
 	{
 		ThreadPool& pool = ThreadPool::Instance();

@@ -1,3 +1,11 @@
+/**
+ * @brief Implementation of the Worker class
+ * 
+ * @file Worker.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "Worker.h"
 #include <regex>
 #include "Enums.h"
@@ -8,7 +16,11 @@
 #include "Parser.h"
 #include "boost/filesystem.hpp"
 
-
+/**
+	 * @brief Sends new resources to the ThreadPool
+	 * 
+	 * @param resource New resource
+	 */
 void Worker::AddResource(std::shared_ptr<Resource> resource)
 {
 	TaskTarget target;
@@ -20,6 +32,11 @@ void Worker::AddResource(std::shared_ptr<Resource> resource)
 	ThreadPool::Instance().schedule(task);
 }
 
+/**
+	 * @brief Sends resource to required handler
+	 * 
+	 * @param task 
+	 */
 void Worker::Work(MyTask *task_)
 {
 	switch (task_->get_target())

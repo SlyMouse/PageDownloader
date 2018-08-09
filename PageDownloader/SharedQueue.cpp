@@ -1,6 +1,20 @@
+/**
+ * @brief Implementation of the SharedQueue class
+ * 
+ * @file SharedQueue.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "SharedQueue.h"
 #include "MyTask.h"
 
+/**
+ * @brief Returns first element
+ * 
+ * @tparam T Type of elements in the queue
+ * @return T& 
+ */
 template <typename T>
 T& SharedQueue<T>::front()
 {
@@ -12,6 +26,11 @@ T& SharedQueue<T>::front()
 	return queue_.front();
 }
 
+/**
+ * @brief Removes the first element
+ * 
+ * @tparam T Type of elements in the queue
+ */
 template <typename T>
 void SharedQueue<T>::pop_front()
 {
@@ -23,6 +42,12 @@ void SharedQueue<T>::pop_front()
 	queue_.pop_front();
 }
 
+/**
+ * @brief  Adds a new element
+ * 
+ * @tparam T Type of elements in the queue
+ * @param item 
+ */
 template <typename T>
 void SharedQueue<T>::push_back(const T& item)
 {
@@ -33,6 +58,12 @@ void SharedQueue<T>::push_back(const T& item)
 
 }
 
+/**
+ * @brief  Adds a new element
+ * 
+ * @tparam T Type of elements in the queue
+ * @param item 
+ */
 template <typename T>
 void SharedQueue<T>::push_back(T&& item)
 {
@@ -43,6 +74,12 @@ void SharedQueue<T>::push_back(T&& item)
 
 }
 
+/**
+ * @brief Current size of queue
+ * 
+ * @tparam T Type of elements in the queue
+ * @return int 
+ */
 template <typename T>
 int SharedQueue<T>::size()
 {
@@ -52,6 +89,13 @@ int SharedQueue<T>::size()
 	return size;
 }
 
+/**
+ * @brief Tells if queue is empty or not
+ * 
+ * @tparam T Type of elements in the queue
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool SharedQueue<T>::empty()
 {
@@ -61,4 +105,7 @@ bool SharedQueue<T>::empty()
 	return empty;
 }
 
+/**
+ * @brief Initializatoin of SharedQueue with MyTask elements
+ */
 template class SharedQueue<MyTask>;

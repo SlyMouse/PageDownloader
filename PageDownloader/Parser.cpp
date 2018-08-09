@@ -1,3 +1,11 @@
+/**
+ * @brief Implementation of the Parser class
+ * 
+ * @file Parser.cpp
+ * @author Artyom Pashkin
+ * @date 09.08.2018
+ */
+
 #include "Parser.h"
 
 #include <array>
@@ -9,11 +17,20 @@
 #include "Worker.h"
 
 
-static constexpr std::array<const char*, 11U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "js" };
-static const std::regex re_link("(href=\"|src=\"|url\\(|&quot;)(.+?)(\\)|\"|&quot;)"); // Link inside href="" / src="" / url()
-static const std::regex re_abs("^((?:.+)?//)(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //If starts with "//" or "<protocol>://". 1 - Protocol, 2 - Hostname, 3 - Path
-static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //File format
+static constexpr std::array<const char*, 11U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "js" }; //!< Whitelist of formats that would be handled
+static const std::regex re_link("(href=\"|src=\"|url\\(|&quot;)(.+?)(\\)|\"|&quot;)"); //!< Link inside href="" / src="" / url()
+static const std::regex re_abs("^((?:.+)?//)(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //!< If starts with "//" or "<protocol>://". 1 - Protocol, 2 - Hostname, 3 - Path
+static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //!< File format
 
+/**
+ * @brief Find substring in string and replace it with another string
+ * 
+ * @param str Original string
+ * @param from Original substring
+ * @param to Replacement
+ * @return true 
+ * @return false 
+ */
 bool replace(std::string *str, const std::string &from, const std::string &to) {
 	size_t start_pos = (*str).find(from);
 	if (start_pos == std::string::npos)
@@ -22,6 +39,11 @@ bool replace(std::string *str, const std::string &from, const std::string &to) {
 	return true;
 }
 
+/**
+	 * @brief Parse resources's content 
+	 * 
+	 * @param resource
+	 */
 void Parser::Parse(std::shared_ptr<Resource> resource)
 {
 	std::smatch link_match;
