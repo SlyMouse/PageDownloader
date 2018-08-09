@@ -7,17 +7,20 @@
 class Resource
 {
 public:
-	Resource(std::string root, std::string working_dir, std::string rel, ResourceType type) : link_root_(root), working_dir_(working_dir), link_rel_(rel), link_abs_(rel), type_(type) {};
-	Resource(std::string root, std::string working_dir, std::string abs, std::string rel, ResourceType type) :
-		link_root_(root), working_dir_(working_dir), link_abs_(abs), link_rel_(rel), type_(type) {};
+	Resource(std::string root, std::string working_dir, std::string rel, ResourceType type) :
+		link_root_(root), working_dir_(working_dir), link_rel_(rel), type_(type) {};
+	Resource(std::string root, std::string working_dir, std::string rel, std::string org, ResourceType type) :
+		link_root_(root), working_dir_(working_dir), link_rel_(rel), link_org_(org), type_(type) {};
 	
 	const std::string & get_link_root();
-	
-	const std::string & get_link_abs();
-	void set_link_abs(std::string link);
-	
+	void set_link_root(std::string link);
+
 	const std::string & get_link_rel();
 	void set_link_rel(std::string link);
+
+	const std::string & get_link_org();
+
+	std::string get_link_abs();
 	
 	const std::string & get_file_name();
 	void set_file_name(std::string name);
@@ -26,7 +29,7 @@ public:
 	
 	const std::string & get_content();
 	void set_content(std::string content);
-	std::string *modify_content();
+	std::string &modify_content();
 	
 	ResourceType get_type();
 
@@ -41,11 +44,11 @@ public:
 	void remove_handled_resources();
 
 private:
-	std::string link_root_;
-	std::string link_abs_;
-	std::string link_rel_;
+	std::string link_root_;   // <protocol>://<hostname>
+	std::string link_rel_;    // <path>
 	std::string file_name_;
-	std::string working_dir_;
+	std::string working_dir_; // <hostname>_<epoch_timestamp>
+	std::string link_org_;
 	std::string content_ = "";
 	ResourceType type_;
 	bool is_saved_ = false;

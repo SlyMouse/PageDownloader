@@ -8,60 +8,66 @@
 #include "boost/filesystem.hpp"
 
 #define THREADS 4
-static constexpr std::array<const char*, 13U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "eot?#iefix", "js", "pdf" };
+static constexpr std::array<const char*, 12U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "js", "pdf" };
+static const std::regex re("^((?:.+)?://)?(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //Correct link. 1 - Protocol, 2 - Hostname, 3 - Path
+static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //File format
+//static const std::regex re_prot("^https?:\/\/.+");
+//static const std::regex re_dir("(https?://)?(www\.)?(.+\..+)");
 
 int main(int argc, char *argv)
 {
-	std::regex re("(https?://)?(www\.)?(.+\..+)");
-	std::regex re_prot("^https?:\/\/.+");
-	std::smatch match;
-	std::smatch match_prot;
-	std::string root;
-	std::string dir;
-	std::vector<std::shared_ptr<Resource>> vec(500);
+	
+	
+	//std::vector<std::shared_ptr<Resource>> vec;
 	{
 		ThreadPool& pool = ThreadPool::Instance();
 		pool.initializeWithThreads(THREADS);
 		for (std::string line; std::getline(std::cin, line);)
 		{
+			std::smatch match;
 			if (line == "")
 				break;
 			if (std::regex_search(line, match, re))
 			{
-				root = match[1].str() + match[3].str();
-				if (!std::regex_search(root, match_prot, re_prot))
-					root = "https://" + root;
-				std::regex re_dir("(https?://)?(www\.)?(.+\..+)");
-				std::regex_search(root, match, re);
-				dir = match[3].str() + "_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
-				std::replace(dir.begin(), dir.end(), '/', '_');
-				std::replace(dir.begin(), dir.end(), '?', '_');
+				std::string root = (match[1].str() == "" ? "https://" : match[1].str()) + match[2].str();
+				std::string dir = match[2].str() + "_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
+				std::string path = match[3].str();
 				dir += "/";
 				boost::filesystem::create_directory(dir);
 				ResourceType type;
 				TaskTarget target = TaskTarget::DownloadAndParse;
-				std::regex re_format = std::regex("\\.((?:.(?!\\.))+)$");
-				if (std::regex_search(line, match, re_format))
+				
+				if(match[3].str() == "")
+					type = ResourceType::Page;
+				else
 				{
-					std::string format = match[1].str();
-					if (format == "css")
-						type = ResourceType::Css;
-					else if (std::find(whitelist_.begin(), whitelist_.end(), format) != whitelist_.end())
+					if (std::regex_search(path, match, re_format))
 					{
-						type = ResourceType::Other;
-						target = TaskTarget::Save;
+						std::string format = match[1].str();
+						if(format == "")
+							type = ResourceType::Page;
+						else if (format == "css")
+							type = ResourceType::Css;
+						else if (std::find(whitelist_.begin(), whitelist_.end(), format) != whitelist_.end())
+						{
+							type = ResourceType::Other;
+							target = TaskTarget::Save;
+						}
+						else
+						{
+							std::cout << "Unsupported file format: " << line << std::endl;
+							continue;
+						}
 					}
 					else
-					{
 						type = ResourceType::Page;
-					}
 				}
-				vec.push_back(std::shared_ptr<Resource>(new Resource(root, dir, line, type)));
-				MyTask task(vec.back(), target);
+				
+				MyTask task(std::shared_ptr<Resource>(new Resource(root, dir, path, type)), target);
 				pool.schedule(task);
 			}
 			else
-				std::cout << "Wrong link format: " << line << std::endl;
+				std::cout << "Incorrect link format: " << line << std::endl;
 		}
 	}
 

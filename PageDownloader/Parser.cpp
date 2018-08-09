@@ -9,7 +9,10 @@
 #include "Worker.h"
 
 
-static constexpr std::array<const char*, 12U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "eot?#iefix", "js" };
+static constexpr std::array<const char*, 11U> whitelist_ = { "png", "jpg", "svg", "bmp", "gif", "woff", "woff2", "tff", "css", "eot", "js" };
+static const std::regex re_link("(href=\"|src=\"|url\\(|&quot;)(.+?)(\\)|\"|&quot;)"); // Link inside href="" / src="" / url()
+static const std::regex re_abs("^((?:.+)?//)(?:www\\.)?([^/].+?\\.[^/]+?)(/(?:.+)|$)"); //If starts with "//" or "<protocol>://". 1 - Protocol, 2 - Hostname, 3 - Path
+static const std::regex re_format = std::regex("\\.((?:.(?!\\.))+?)($|\\?)"); //File format
 
 bool replace(std::string *str, const std::string &from, const std::string &to) {
 	size_t start_pos = (*str).find(from);
@@ -21,33 +24,45 @@ bool replace(std::string *str, const std::string &from, const std::string &to) {
 
 void Parser::Parse(std::shared_ptr<Resource> resource)
 {
-	std::regex re;
-	std::regex link_re;
 	std::smatch link_match;
 	std::smatch match;
-	std::string abs;
-	std::string rel;
 	std::string content = resource->get_content();
 	ResourceType type;
-
-	link_re = std::regex("(href=\"|src=\"|url\\()(.+?)(\\)|\")");
+	
 	std::string::const_iterator searchStart(content.cbegin());
-	while (std::regex_search(searchStart, content.cend(), link_match, link_re))
+	while (std::regex_search(searchStart, content.cend(), link_match, re_link))
 	{
-		rel = link_match[2].str();
-		abs = rel;
-
-		re = std::regex("^/([^/].*)");
-		if (std::regex_search(rel, match, re))
-			abs = resource->get_link_root() + rel;
-
-		re = std::regex("^//(.*)");
-		if (std::regex_search(rel, match, re))
+		std::regex re;
+		std::string original = link_match[2].str();
+		if (original.size() > 200)
 		{
-			re = std::regex("^(.+?)//");
-			std::regex_search(resource->get_link_root(), match, re);
+			searchStart += link_match.position() + link_match.length();
+			continue;
+		}
+		std::string hostname;
+		std::string path = link_match[2].str();
+
+		re = std::regex("^/([^/].*)"); //If starts with "/"
+		if (std::regex_search(path, match, re))
+			hostname = resource->get_link_root();
+		else if (std::regex_search(path, match, re_abs))
+		{
 			std::string protocol = match[1].str();
-			abs = protocol + rel;
+			hostname = match[2].str();
+			path = match[3].str();
+			if (protocol == "//")
+			{
+				re = std::regex("^(.+?//)"); // Protocol from parent hostname
+				std::regex_search(resource->get_link_root(), match, re);
+				hostname = match[1].str() + hostname;
+			}
+			else
+				hostname = protocol + hostname;
+		}
+		else
+		{
+			searchStart += link_match.position() + link_match.length();
+			continue;
 		}
 		
 		/* Skip if found link's base domain is different from original domain
@@ -67,8 +82,7 @@ void Parser::Parse(std::shared_ptr<Resource> resource)
 			continue;
 		}*/
 
-		re = std::regex("\\.((?:.(?!\\.))+)$");
-		if (std::regex_search(rel, match, re))
+		if (std::regex_search(path, match, re_format))
 		{
 			std::string format = match[1].str();
 			/*if (format.compare("html"))
@@ -86,13 +100,13 @@ void Parser::Parse(std::shared_ptr<Resource> resource)
 		}
 		else
 		{
-			if (rel != abs)
-				Replacer::Replace(resource->modify_content(), rel, abs);
+			if (link_match[2].str() != (hostname + path))
+				Replacer::Replace(resource->modify_content(), link_match[2].str(), hostname + path);
 			searchStart += link_match.position() + link_match.length();
 			continue;
 		}
 
-		std::shared_ptr<Resource> found_resource = std::shared_ptr<Resource>(new Resource(resource->get_link_root(), resource->get_working_dir(), abs, rel, type));
+		std::shared_ptr<Resource> found_resource = std::shared_ptr<Resource>(new Resource(hostname, resource->get_working_dir(), path, original, type));
 		Worker::AddResource(resource->add_resource(found_resource));
 
 		searchStart += link_match.position() + link_match.length();

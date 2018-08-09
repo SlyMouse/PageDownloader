@@ -5,7 +5,7 @@
 class Replacer
 {
 public:
-	static bool Replace(std::string *str, const std::string &from, const std::string &to);
+	static bool Replace(std::string &str, const std::string &from, const std::string &to);
 	static void Replace(std::shared_ptr<Resource>);
 };
 #endif

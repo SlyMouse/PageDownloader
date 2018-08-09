@@ -2,12 +2,12 @@
 #include <algorithm>
 
 const std::string & Resource::get_link_root() { return link_root_; };
-
-const std::string & Resource::get_link_abs() { return link_abs_; };
-void Resource::set_link_abs(std::string link) { link_abs_ = link; };
+void Resource::set_link_root(std::string link) { link_root_ = link; };
 
 const std::string & Resource::get_link_rel() { return link_rel_; };
 void Resource::set_link_rel(std::string link) { link_rel_ = link; };
+
+const std::string & Resource::get_link_org() { return link_org_; };
 
 const std::string & Resource::get_file_name() { return file_name_; };
 void Resource::set_file_name(std::string name) { file_name_ = name; };
@@ -16,7 +16,7 @@ const std::string & Resource::get_working_dir() { return working_dir_; };
 
 const std::string & Resource::get_content() { return content_; };
 void Resource::set_content(std::string content) { content_ = content; };
-std::string * Resource::modify_content() { return &content_; };
+std::string & Resource::modify_content() { return content_; };
 
 ResourceType Resource::get_type() { return type_; };
 
@@ -43,3 +43,5 @@ void Resource::remove_handled_resources()
 {
 	resources_.erase(std::remove_if(resources_.begin(), resources_.end(), isHandled), resources_.end());
 }
+
+std::string Resource::get_link_abs() { return link_root_ + link_rel_; }
